@@ -49,13 +49,13 @@
 #include <boost/tokenizer.hpp>
 #include <stdint.h>
 //#include <pcl_visualization/cloud_viewer.h>
-#include "pcl_visualization/pcl_visualizer.h"
+#include "pcl/visualization/pcl_visualizer.h"
 //#include "../../combine_clouds/src/CombineUtils.h"
 
 
 #include "pcl/ModelCoefficients.h"
 #include "pcl/kdtree/kdtree.h"
-#include "pcl/kdtree/tree_types.h"
+//#include "pcl/kdtree/tree_types.h"
 #include <pcl/features/normal_3d.h>
 
 #include "pcl/io/pcd_io.h"
@@ -77,14 +77,14 @@
 //typedef pcl::PointXYZRGB PointT;
 //std::string initLabels[]={"wall","floor","table","shelf","chair","cpu","monitor","clutter"};
 
-typedef pcl_visualization::PointCloudColorHandler<sensor_msgs::PointCloud2> ColorHandler;
+typedef pcl::visualization::PointCloudColorHandler<sensor_msgs::PointCloud2> ColorHandler;
 typedef ColorHandler::Ptr ColorHandlerPtr;
 typedef pcl::PointXYZRGBCamSL PointT;
 using namespace boost;
 dynamic_reconfigure::Server < semantic_label_3d::labelviewerConfig > *srv;
 semantic_label_3d::labelviewerConfig conf;
 boost::recursive_mutex global_mutex;
-pcl_visualization::PCLVisualizer viewer("3D Viewer");
+pcl::visualization::PCLVisualizer viewer("3D Viewer");
 int viewportOrig = 0;
 int viewportPred = 0;
 std::vector<std::string> labels;
@@ -113,7 +113,7 @@ sqrG(float y) {
     return y*y;
 }
 //typedef my_ns::MyPoint PointT;
-using namespace pcl_visualization;
+using namespace pcl::visualization;
 
 void get_sorted_indices(pcl::PointCloud<PointT> &incloud, std::vector<int> &segmentindices, int size) {
     std::map<int, int> countmap;
@@ -303,7 +303,7 @@ void reconfig(semantic_label_3d::labelviewerConfig & config, uint32_t level) {
                 }
                 doUpdate = true;
                 pcl::toROSMsg(*cloud_colored_orig, cloud_blob_filtered_orig);
-                color_handler_orig.reset(new pcl_visualization::PointCloudColorHandlerRGBField<sensor_msgs::PointCloud2 > (cloud_blob_filtered_orig));
+                color_handler_orig.reset(new pcl::visualization::PointCloudColorHandlerRGBField<sensor_msgs::PointCloud2 > (cloud_blob_filtered_orig));
                 viewer.addPointCloud(*cloud_colored_orig, color_handler_orig, "orig", viewportOrig);
 
                 c = apply_label_filter(*cloud_colored_pred, labelNums,labelColors[color]->getFloatRep());
@@ -325,7 +325,7 @@ void reconfig(semantic_label_3d::labelviewerConfig & config, uint32_t level) {
                 }
                 doUpdate = true;
                 pcl::toROSMsg(*cloud_colored_pred, cloud_blob_filtered_pred);
-                color_handler_pred.reset(new pcl_visualization::PointCloudColorHandlerRGBField<sensor_msgs::PointCloud2 > (cloud_blob_filtered_pred));
+                color_handler_pred.reset(new pcl::visualization::PointCloudColorHandlerRGBField<sensor_msgs::PointCloud2 > (cloud_blob_filtered_pred));
                 viewer.addPointCloud(*cloud_colored_pred, color_handler_pred, "pred", viewportPred);
 
             }/* else {
@@ -351,7 +351,7 @@ void reconfig(semantic_label_3d::labelviewerConfig & config, uint32_t level) {
 
 
             pcl::toROSMsg(*cloud_colored_orig, cloud_blob_filtered_orig);
-            color_handler_orig.reset(new pcl_visualization::PointCloudColorHandlerRGBField<sensor_msgs::PointCloud2 > (cloud_blob_filtered_orig));
+            color_handler_orig.reset(new pcl::visualization::PointCloudColorHandlerRGBField<sensor_msgs::PointCloud2 > (cloud_blob_filtered_orig));
             viewer.addPointCloud(*cloud_colored_orig, color_handler_orig, "orig", viewportOrig);
 
 
@@ -430,9 +430,9 @@ main(int argc, char** argv) {
     viewer.createViewPort(0.0, 0.0, 0.5, 1.0, viewportOrig);
     viewer.createViewPort(0.5, 0.0, 1.0, 1.0, viewportPred);
     //for (int i = 1 ; i <= max_segment_num ; i++ ){
-    color_handler_orig.reset(new pcl_visualization::PointCloudColorHandlerRGBField<sensor_msgs::PointCloud2 > (cloud_blob_orig));
+    color_handler_orig.reset(new pcl::visualization::PointCloudColorHandlerRGBField<sensor_msgs::PointCloud2 > (cloud_blob_orig));
 
-    color_handler_pred.reset(new pcl_visualization::PointCloudColorHandlerRGBField<sensor_msgs::PointCloud2 > (cloud_blob_pred));
+    color_handler_pred.reset(new pcl::visualization::PointCloudColorHandlerRGBField<sensor_msgs::PointCloud2 > (cloud_blob_pred));
     viewer.addPointCloud(*orig_cloud_ptr, color_handler_orig, "orig", viewportOrig);
     viewer.addPointCloud(*pred_cloud_ptr, color_handler_pred, "pred", viewportPred);
     //viewer.spinOnce(5000, true);

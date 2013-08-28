@@ -3,15 +3,15 @@
 #include<set>
 using namespace std;
 
-//template class pcl::ExtractIndices<pcl::PointXYGRGBCam>;
+//template class pcl::ExtractIndices<pcl::PointXYZRGBCam>;
 
-void filterBasedOnCam(pcl::PointCloud<pcl::PointXYGRGBCam>::Ptr in,pcl::PointCloud<pcl::PointXYGRGBCam>::Ptr out, vector<TransformG> & trasforms)
+void filterBasedOnCam(pcl::PointCloud<pcl::PointXYZRGBCam>::Ptr in,pcl::PointCloud<pcl::PointXYZRGBCam>::Ptr out, vector<TransformG> & trasforms)
 {
    double radius=0.1;
-   pcl::PointXYGRGBCam cpoint;
+   pcl::PointXYZRGBCam cpoint;
     out->header=in->header;
     set<int> indices;
-  pcl::KdTreeFLANN<pcl::PointXYGRGBCam> nnFinder;
+  pcl::KdTreeFLANN<pcl::PointXYZRGBCam> nnFinder;
   nnFinder.setInputCloud(in);
   std::vector<int> k_indices;
   std::vector<float> k_distances;
@@ -19,7 +19,7 @@ void filterBasedOnCam(pcl::PointCloud<pcl::PointXYGRGBCam>::Ptr in,pcl::PointClo
   int minDist;
   int minCamIndex;
   float distance;
-        pcl::ExtractIndices<pcl::PointXYGRGBCam> extract;
+        pcl::ExtractIndices<pcl::PointXYZRGBCam> extract;
         pcl::PointIndices::Ptr outliers (new pcl::PointIndices ());
     for(int i=0;i<in->size();i++)
     {
@@ -81,7 +81,7 @@ main(int argc, char** argv)
     std::cerr << "opening " << argv[1] << std::endl;
     bag.open(argv[1], rosbag::bagmode::Read);
     pcl::PointCloud<PointT>::Ptr cloud_filtered(new pcl::PointCloud<PointT > ());// cloud_transformed(new pcl::PointCloud<PointT > ());
-    pcl::PointCloud<pcl::PointXYGRGBCam>::Ptr final_cloud(new pcl::PointCloud<pcl::PointXYGRGBCam > ()),cloud_wCamIndices(new pcl::PointCloud<pcl::PointXYGRGBCam > ()),final_wCamIndices(new pcl::PointCloud<pcl::PointXYGRGBCam > ());
+    pcl::PointCloud<pcl::PointXYZRGBCam>::Ptr final_cloud(new pcl::PointCloud<pcl::PointXYZRGBCam > ()),cloud_wCamIndices(new pcl::PointCloud<pcl::PointXYZRGBCam > ()),final_wCamIndices(new pcl::PointCloud<pcl::PointXYZRGBCam > ());
 
     int tf_count = 0;
     int pcl_count = 0;
@@ -180,7 +180,7 @@ main(int argc, char** argv)
     bag.close();
     pcl::PCDWriter writer;
 
-    writer.write<pcl::PointXYGRGBCam > ("/home/aa755/VisibilityMerged.pcd", *final_wCamIndices, false);
+    writer.write<pcl::PointXYZRGBCam > ("/home/aa755/VisibilityMerged.pcd", *final_wCamIndices, false);
 
 
 }

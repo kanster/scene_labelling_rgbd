@@ -19,7 +19,7 @@
 #include "sensor_msgs/point_cloud_conversion.h"
 #include "includes/color.cpp"
 #include "pcl/kdtree/kdtree.h"
-#include "pcl/kdtree/tree_types.h"
+//#include "pcl/kdtree/tree_types.h"
 //#include <point_cloud_mapping/geometry/nearest.h>
 #include <pcl_ros/io/bag_io.h>
 #include "HOG.cpp"
@@ -33,12 +33,12 @@ typedef pcl::PointXYZRGBCamSL PointT;
 //#include <boost/numeric/bindings/traits/ublas_vector2.hpp>
 //namespace ublas = boost::numeric::ublas;
 //namespace lapack= boost::numeric::bindings::lapack;
-#include "pcl_visualization/pcl_visualizer.h"
-typedef pcl_visualization::PointCloudColorHandler<sensor_msgs::PointCloud2> ColorHandler;
+#include "pcl/visualization/pcl_visualizer.h"
+typedef pcl::visualization::PointCloudColorHandler<sensor_msgs::PointCloud2> ColorHandler;
 typedef ColorHandler::Ptr ColorHandlerPtr;
 #include "time.h"
-typedef pcl::KdTree<PointT> KdTree;
-typedef pcl::KdTree<PointT>::Ptr KdTreePtr;
+//typedef pcl::KdTree<PointT> KdTree;
+//typedef pcl::KdTree<PointT>::Ptr KdTreePtr;
 using namespace boost;
 #include "includes/segmentAndLabel.h"
 #include "openni_listener.h"
@@ -56,8 +56,8 @@ ros::Publisher pub;
 //typedef pcl::PointXYGRGBCam PointT;
 TransformG globalTransform;
 
-typedef pcl::KdTree<PointT> KdTree;
-typedef pcl::KdTree<PointT>::Ptr KdTreePtr;
+//typedef pcl::KdTree<PointT> KdTree;
+//typedef pcl::KdTree<PointT>::Ptr KdTreePtr;
 bool UseVolFeats = false;
 bool BinFeatures = true;
 static const string nodeBinFile = "binStumpsN.txt";

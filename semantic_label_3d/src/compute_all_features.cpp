@@ -292,7 +292,7 @@ pair<float,int>  getSmallestDistance (const pcl::PointCloud<PointT> &cloud1,cons
 
 void get_neighbors ( const std::vector<pcl::PointCloud<PointT> > &segment_clouds, map< pair <int,int> , float > &distance_matrix, map <int , vector <int> > &neighbor_map )
 {
-   float tolerance =0.15;
+   float tolerance =0.6;
 // get distance matrix
     for (size_t i = 0; i< segment_clouds.size(); i++)
     {
@@ -1006,12 +1006,15 @@ int main(int argc, char** argv) {
         buildOctoMap(cloud,  tree);  
     }
     
-    if(SHOW_CAM_POS_IN_VIEWER)
+    /*if(SHOW_CAM_POS_IN_VIEWER)
       {
-      ColorHandlerPtr color_handler;
-  pcl_visualization::PCLVisualizer viewer ("3D Viewer");
-          color_handler.reset (new pcl_visualization::PointCloudColorHandlerRGBField<sensor_msgs::PointCloud2 > (cloud_blob));
-          viewer.addPointCloud (*cloud_ptr, color_handler, "cloud");
+      //ColorHandlerPtr color_handler;
+          pcl::visualization::PCLVisualizer viewer ("3D Viewer");
+          //color_handler.reset (new pcl::visualization::PointCloudColorHandlerRGBField<sensor_msgs::PointCloud2 > (cloud_blob));
+          pcl::PointCloud<PointT>::ConstPtr cloud_ptr_v(new pcl::PointCloud<PointT > (cloud));
+          pcl::visualization::PointCloudColorHandlerRGBField<PointT> color_handler(cloud_ptr_v);
+          //viewer.addPointCloud (*cloud_ptr, color_handler, "cloud");
+          viewer.addPointCloud (cloud_ptr_v, color_handler, "cloud");
   
     for(unsigned int i=0;i<originalFrames.size ();i++)
       {
@@ -1023,7 +1026,7 @@ int main(int argc, char** argv) {
       }
           
           viewer.spin ();
-      }
+      }*/
     assert(cloudUntransformed.size()==cloud.size ());
 
     pcl::PointCloud<PointT>::Ptr cloud_filtered(new pcl::PointCloud<PointT > ());

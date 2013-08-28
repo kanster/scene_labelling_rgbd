@@ -10,11 +10,13 @@
   <url>http://pr.cs.cornell.edu/sceneunderstanding/</url>
   <depend package="pcl_ros"/>
   <depend package="pcl"/>
-  <depend package="eigen"/>
-  <depend package="pcl_visualization"/>
+  <!--depend package="eigen"/-->
+  <!--depend package="pcl_visualization"/-->
   <depend package="rospy"/>
   <depend package="roscpp"/>
- <depend package="octomap_ros"/>
+ <!--depend package="octomap_ros"/-->
+ <depend package="octomap"/>
+ <depend package="rosbag"/>
   <depend package="opencv2"/>
 
   <export>

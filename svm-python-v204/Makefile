@@ -83,13 +83,13 @@ svm_struct_clean:
 #-------------------------#
 
 $(CLASS_TARGET): svm_light_hideo_noexe svm_struct_noexe svm_struct_api.o svm_struct/svm_struct_classify.o svm_struct/svm_struct_common.o svm_struct/svm_struct_main.o $(PY_OBJS)
-	$(LD) $(LDFLAGS) svm_struct_api.o svm_struct/svm_struct_classify.o svm_light/svm_common.o svm_struct/svm_struct_common.o $(PY_OBJS) $(PYTHON_LD_FLAGS) $(LIBS) -o $@
+	$(LD) $(LDFLAGS) svm_struct_api.o svm_struct/svm_struct_classify.o svm_light/svm_common.o svm_struct/svm_struct_common.o $(PY_OBJS) $(PYTHON_LD_FLAGS) $(LIBS) -lm -o $@
 
 $(TRAIN_TARGET)_loqo: svm_light_loqo_noexe svm_struct_noexe svm_struct_api.o svm_struct/svm_struct_learn.o svm_struct/svm_struct_common.o svm_struct/svm_struct_main.o $(PY_OBJS)
-	$(LD) $(LDFLAGS) svm_struct/svm_struct_learn.o svm_struct_api.o svm_light/svm_loqo.o svm_light/pr_loqo/pr_loqo.o svm_light/svm_learn.o svm_light/svm_common.o svm_struct/svm_struct_common.o svm_struct/svm_struct_main.o $(PY_OBJS) $(PYTHON_LD_FLAGS) $(LIBS) -o $(TRAIN_TARGET)
+	$(LD) $(LDFLAGS) svm_struct/svm_struct_learn.o svm_struct_api.o svm_light/svm_loqo.o svm_light/pr_loqo/pr_loqo.o svm_light/svm_learn.o svm_light/svm_common.o svm_struct/svm_struct_common.o svm_struct/svm_struct_main.o $(PY_OBJS) $(PYTHON_LD_FLAGS) $(LIBS) -lm -o $(TRAIN_TARGET)
 
 $(TRAIN_TARGET)_hideo: $(TRAIN_TARGET)_% : svm_light_%_noexe svm_struct_noexe svm_struct_api.o  svm_struct/svm_struct_learn.o svm_struct/svm_struct_common.o svm_struct/svm_struct_main.o $(PY_OBJS)
-	$(LD) $(LDFLAGS) svm_struct/svm_struct_learn.o svm_struct_api.o svm_light/svm_$*.o svm_light/svm_learn.o svm_light/svm_common.o svm_struct/svm_struct_common.o svm_struct/svm_struct_main.o $(PY_OBJS) $(PYTHON_LD_FLAGS) $(LIBS) -o $(TRAIN_TARGET)
+	$(LD) $(LDFLAGS) svm_struct/svm_struct_learn.o svm_struct_api.o svm_light/svm_$*.o svm_light/svm_learn.o svm_light/svm_common.o svm_struct/svm_struct_common.o svm_struct/svm_struct_main.o $(PY_OBJS) $(PYTHON_LD_FLAGS) $(LIBS) -lm -o $(TRAIN_TARGET)
 
 $(PY_OBJS): %.o : %.c %.h
 	$(CC) -c $(CFLAGS) $(PYTHON_CC_FLAGS) $< -o $@

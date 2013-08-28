@@ -7,7 +7,9 @@
 #include "pcl/io/pcd_io.h"
 #include "includes/point_types.h"
 #include "pcl/filters/passthrough.h"
+#include <pcl/filters/impl/passthrough.hpp>
 #include "pcl/filters/extract_indices.h"
+#include <pcl/filters/impl/extract_indices.hpp>
 #include "pcl/features/intensity_spin.h"
 #include "pcl/features/normal_3d.h"
 //#include "descriptors_3d/all_descriptors.h"
@@ -19,7 +21,7 @@
 #include "sensor_msgs/point_cloud_conversion.h"
 #include "includes/color.cpp"
 #include "pcl/kdtree/kdtree.h"
-#include "pcl/kdtree/tree_types.h"
+//#include "pcl/kdtree/tree_types.h"
 //#include <point_cloud_mapping/geometry/nearest.h>
 #include <pcl_ros/io/bag_io.h>
 #include "HOG.cpp"
@@ -32,10 +34,14 @@ typedef pcl::PointXYZRGBCamSL PointT;
 //#include <boost/numeric/bindings/traits/ublas_vector2.hpp>
 //namespace ublas = boost::numeric::ublas;
 //namespace lapack= boost::numeric::bindings::lapack;
-#include "pcl_visualization/pcl_visualizer.h"
-typedef pcl_visualization::PointCloudColorHandler<sensor_msgs::PointCloud2> ColorHandler;
+#include "pcl/visualization/pcl_visualizer.h"
+//#include "pcl/visualization/impl/pcl_visualizer.hpp"
+//#include "pcl/visualization/impl/point_cloud_handlers.hpp"
+//typedef pcl::visualization::PointCloudColorHandler<sensor_msgs::PointCloud2> ColorHandler;
+typedef pcl::visualization::PointCloudColorHandler<PointT> ColorHandler;
 typedef ColorHandler::Ptr ColorHandlerPtr;
-
+#define IMG_WIDTH 640 ;
+#define IMG_HEIGHT 480 ;
 
 //#include <Eig>
 //typedef pcl::PointXYGRGBCam PointT;
@@ -63,8 +69,8 @@ public:
   void saveImage(int segmentId,int label,vector<Point2DAbhishek>points)
   {
   CvSize size;
-  size.height=480;
-  size.width=640;
+  size.height=IMG_HEIGHT;
+  size.width=IMG_WIDTH;
   IplImage * image = cvCreateImage ( size, IPL_DEPTH_32F, 3 );
   
           pcl::PointXYZRGB tmp;
@@ -101,8 +107,8 @@ cvReleaseImage (&image);
   void saveImage(std::string filename)
   {
   CvSize size;
-  size.height=480;
-  size.width=640;
+  size.height=IMG_HEIGHT;
+  size.width=IMG_WIDTH;
   IplImage * image = cvCreateImage ( size, IPL_DEPTH_32F, 3 );
   
           pcl::PointXYZRGB tmp;
@@ -127,8 +133,8 @@ cvReleaseImage (&image);
     cameraTransSet=false;
     RGBDSlamFrame=RGBDSlamFrame_;
   CvSize size;
-  size.height=480;
-  size.width=640;
+  size.height=IMG_HEIGHT;
+  size.width=IMG_WIDTH;
   cout<<"RGBslam size:"<<RGBDSlamFrame->size ()<<endl;
     if(RGBDSlamFrame->size ()==0)
       return;// can be 0 for dummy pcds of manually transformed
@@ -158,7 +164,8 @@ cvReleaseImage (&image);
   static Point2DAbhishek getPixelFromIndex(int index)
   {
     //assuming size is 640*480;
-    int width=640;
+    int width=IMG_WIDTH;
+    //int width=320;
     Point2DAbhishek ret;
     ret.y=index/width;
     ret.x=index%width;
@@ -384,9 +391,10 @@ public:
 
 void computeGlobalTransform(pcl::PointCloud<PointT> & combined_cloud_trans /*z aligned and possibly axis aligned*/,pcl::PointCloud<PointT> & combined_cloud_orig,TransformG & globalTrans)
 {
-  int numPoints=combined_cloud_orig.size ()-1;// semantics of first point not known
+  int numPoints=1000;//combined_cloud_orig.points.size ()-1;// semantics of first point not known
   //ublas::matrix<float,ublas::column_major> A(numPoints,4);
   //ublas::vector<float> b(numPoints);
+  //cout << "numpoints:" << numPoints << endl;
   matrx <double>A(numPoints,4);
   std::vector<double> b(numPoints);
 
@@ -401,10 +409,11 @@ void computeGlobalTransform(pcl::PointCloud<PointT> & combined_cloud_trans /*z a
         
     for(unsigned i=0;i < numPoints;i++)
         {
-        
-	  A.setvalue(i,0,combined_cloud_orig.points[i+1].x);
-	  A.setvalue(i,1,combined_cloud_orig.points[i+1].y);
-	  A.setvalue(i,2,combined_cloud_orig.points[i+1].z);
+      //cout << "i:" << i << " cr:" << cr << endl;
+      //cout << "vale:" << combined_cloud_orig.points.at(i+1).x << endl;  
+	  A.setvalue(i,0,combined_cloud_orig.points.at(i+1).x);
+	  A.setvalue(i,1,combined_cloud_orig.points.at(i+1).y);
+	  A.setvalue(i,2,combined_cloud_orig.points.at(i+1).z);
 //             assert(combined_cloud_orig.points[i].x==combined_cloud_orig.points[i].data[0]);
 //             assert(combined_cloud_orig.points[i].y==combined_cloud_orig.points[i].data[1]);
 //             assert(combined_cloud_orig.points[i].z==combined_cloud_orig.points[i].data[2]);
@@ -425,8 +434,8 @@ void computeGlobalTransform(pcl::PointCloud<PointT> & combined_cloud_trans /*z a
         {
              double lhs=combined_cloud_orig.points[i].x*b[0]+combined_cloud_orig.points[i].y*b[1]+combined_cloud_orig.points[i].z*b[2]+b[3];
              double rhs=combined_cloud_trans.points[i].data[cr];
-         //    cout<<lhs<<","<<rhs<<endl;
-             assert(fabs(lhs-rhs)<0.01);
+    //         cout<<lhs<<","<<rhs<<endl;
+    //         assert(fabs(lhs-rhs)<0.01);
         }
     
 
@@ -439,13 +448,14 @@ void computeGlobalTransform(pcl::PointCloud<PointT> & combined_cloud_trans /*z a
 void gatherOriginalFrames(std::string unTransformedPCDFile,std::string RGBDSlamBag,vector<OriginalFrameInfo*> & originalFrames,  pcl::PointCloud<PointT> & cloudUntransformed  )
 {
        sensor_msgs::PointCloud2 cloud_blob;
-    if (pcl::io::loadPCDFile(unTransformedPCDFile, cloud_blob) == -1) {
+    //if (pcl::io::loadPCDFile(unTransformedPCDFile, cloud_blob) == -1) {
+    if (pcl::io::loadPCDFile(unTransformedPCDFile, cloudUntransformed) == -1) {
         ROS_ERROR("Couldn't read argv[3]");
         exit(-1);
     }
      
 //    pcl::fromROSMsg(cloud_blob, cloudUntransformedUnfiltered);
-    pcl::fromROSMsg(cloud_blob, cloudUntransformed);
+   // pcl::fromROSMsg(cloud_blob, cloudUntransformed);
     /*
       pcl::PointCloud<PointT>::Ptr cloud_temp_ptr (new pcl::PointCloud<PointT > (cloudUntransformedUnfiltered));
 
@@ -469,6 +479,7 @@ void gatherOriginalFrames(std::string unTransformedPCDFile,std::string RGBDSlamB
     {
       reader.open (RGBDSlamBag, rosbag::bagmode::Read);
       view.addQuery (reader, rosbag::TopicQuery ("/rgbdslam/my_clouds"));
+      //view.addQuery (reader, rosbag::TopicQuery ("/rgbdslam/batch_clouds"));
       
       if (view.size () == 0)
 	check = false;
@@ -520,7 +531,7 @@ void gatherOriginalFrames(std::string unTransformedPCDFile,std::string RGBDSlamB
             tf::tfMessageConstPtr tf_ptr = mtf.instantiate<tf::tfMessage > ();
             assert(tf_ptr != NULL);
             std::vector<geometry_msgs::TransformStamped> bt;
-            tf_ptr->get_transforms_vec(bt);
+            bt = tf_ptr->transforms;
             tf::Transform tft(getQuaternion(bt[0].transform.rotation), getVector3(bt[0].transform.translation));
 
             //  transG.print();

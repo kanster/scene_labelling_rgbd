@@ -11,7 +11,7 @@
 #include <stdint.h>
 #include "pcl/ros/register_point_struct.h"
 #include "pcl/kdtree/kdtree.h"
-#include "pcl/kdtree/tree_types.h"
+//#include "pcl/kdtree/tree_types.h"
 #include "pcl/io/pcd_io.h"
 #include <string>
 #include <pcl_ros/io/bag_io.h>
@@ -45,9 +45,9 @@
 typedef pcl::PointXYZRGBNormal PointT;
 #include "includes/CombineUtils.h"
 #include<set>
-#include "pcl_visualization/pcl_visualizer.h"
+#include "pcl/visualization/pcl_visualizer.h"
 using namespace std;
-typedef pcl_visualization::PointCloudColorHandler<sensor_msgs::PointCloud2> ColorHandler;
+typedef pcl::visualization::PointCloudColorHandler<sensor_msgs::PointCloud2> ColorHandler;
 
 bool detectOcclusion=true;
 int
@@ -56,7 +56,7 @@ main(int argc, char** argv)
           sensor_msgs::PointCloud2 cloud_final_msg;
   sensor_msgs::PointCloud2 cloud_merged_all_points_msg;
     //  ros::init(argc, argv,"hi");
-    pcl_visualization::PCLVisualizer *viewerPtr;
+    pcl::visualization::PCLVisualizer *viewerPtr;
     bool interactive=false;
    int viewportCloud;
     int viewportCluster;
@@ -66,7 +66,7 @@ main(int argc, char** argv)
     if(argc>2&& argv[2][0]=='-'&& argv[2][1]=='i')
     {
         interactive=true;
-        pcl_visualization::PCLVisualizer viewer("3D Viewer");
+        pcl::visualization::PCLVisualizer viewer("3D Viewer");
         viewer.createViewPort(0.0,0.0,0.5,1.0,viewportCloud);
         viewer.createViewPort(0.5,0.0,1.0,1.0,viewportCluster);
 
@@ -80,9 +80,9 @@ main(int argc, char** argv)
     bag.open(argv[1], rosbag::bagmode::Read);
     pcl::PointCloud<pcl::PointXYZRGB>::Ptr  cloud_filtered(new pcl::PointCloud<pcl::PointXYZRGB> ());// cloud_transformed(new pcl::PointCloud<PointT > ());
     pcl::PointCloud<PointT>::Ptr  cloud_normal(new pcl::PointCloud<PointT > ());// cloud_transformed(new pcl::PointCloud<PointT > ());
-    pcl::PointCloud<pcl::PointXYGRGBCam>::Ptr final_cloud(new pcl::PointCloud<pcl::PointXYGRGBCam> ());
-    pcl::PointCloud<pcl::PointXYGRGBCam>::Ptr final_cloud_backup(new pcl::PointCloud<pcl::PointXYGRGBCam> ());
-    pcl::PointCloud<pcl::PointXYGRGBCam>::Ptr temp_cloud(new pcl::PointCloud<pcl::PointXYGRGBCam> ());
+    pcl::PointCloud<pcl::PointXYZRGBCam>::Ptr final_cloud(new pcl::PointCloud<pcl::PointXYZRGBCam> ());
+    pcl::PointCloud<pcl::PointXYZRGBCam>::Ptr final_cloud_backup(new pcl::PointCloud<pcl::PointXYZRGBCam> ());
+    pcl::PointCloud<pcl::PointXYZRGBCam>::Ptr temp_cloud(new pcl::PointCloud<pcl::PointXYZRGBCam> ());
 
     int tf_count = 0;
     int pcl_count = 0;
@@ -159,7 +159,7 @@ main(int argc, char** argv)
             tf::tfMessageConstPtr tf_ptr = mtf.instantiate<tf::tfMessage > ();
             assert(tf_ptr != NULL);
             std::vector<geometry_msgs::TransformStamped> bt;
-            tf_ptr->get_transforms_vec(bt);
+            bt = tf_ptr->transforms;
             tf::Transform tft(getQuaternion(bt[0].transform.rotation), getVector3(bt[0].transform.translation));
 
             //  transG.print();
@@ -332,14 +332,14 @@ main(int argc, char** argv)
                     }
                     if(c==transformsG.size())
                     {
-                        pcl::PointXYGRGBCam newPoint;
+                        pcl::PointXYZRGBCam newPoint;
                         newPoint.x=cpoint.x;
                         newPoint.y=cpoint.y;
                         newPoint.z=cpoint.z;
                         newPoint.rgb=cpoint.rgb;
-                        newPoint.normal_x=cpoint.normal_x;
-                        newPoint.normal_y=cpoint.normal_y;
-                        newPoint.normal_z=cpoint.normal_z;
+                        //newPoint.normal_x=cpoint.normal_x;
+                        //newPoint.normal_y=cpoint.normal_y;
+                       // newPoint.normal_z=cpoint.normal_z;
                         newPoint.cameraIndex=transformsG.size();
                         newPoint.distance=VectorG(cpoint).subtract(transG.getOrigin()).getNorm();
                         final_cloud->points.push_back(newPoint);
@@ -349,20 +349,20 @@ main(int argc, char** argv)
                         rejectCount++;
                     }
                 }
-                if (interactive) 
+          /*      if (interactive) 
                 {
                     *temp_cloud=*final_cloud_backup;//+*cloud_normal;
                     pcl::toROSMsg(*final_cloud, cloud_final_msg);
                     pcl::toROSMsg(*temp_cloud, cloud_merged_all_points_msg);
 
-                    color_handler.reset(new pcl_visualization::PointCloudColorHandlerRGBField<sensor_msgs::PointCloud2 > (cloud_final_msg));
+                    color_handler.reset(new pcl::visualization::PointCloudColorHandlerRGBField<sensor_msgs::PointCloud2 > (cloud_final_msg));
                     viewerPtr->addPointCloud(*final_cloud, color_handler, "cloud", viewportCloud);
-                    color_handler.reset(new pcl_visualization::PointCloudColorHandlerRGBField<sensor_msgs::PointCloud2 > (cloud_merged_all_points_msg));
+                    color_handler.reset(new pcl::visualization::PointCloudColorHandlerRGBField<sensor_msgs::PointCloud2 > (cloud_merged_all_points_msg));
                     viewerPtr->addPointCloud(*temp_cloud, color_handler, "cluster", viewportCluster);
                     viewerPtr->spin();
 
-                }
-                else
+                }*/
+               // else
                 {
                     lastAcceptedIndex=pcl_count;
                 }
@@ -386,7 +386,7 @@ main(int argc, char** argv)
     std::cerr<<"nof rejected points "<<rejectCount;;
  //   applyFilters(final_cloud, cloud_filtered);
     string filename=string(argv[1]).append(".combined.pcd");
-            writer.write<pcl::PointXYGRGBCam > (filename, *final_cloud, true);
+            writer.write<pcl::PointXYZRGBCam > (filename, *final_cloud, true);
 
     bag.close();
 

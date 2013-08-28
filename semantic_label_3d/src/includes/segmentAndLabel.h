@@ -5,15 +5,21 @@
 #include "color.cpp"
 #include "pcl/ModelCoefficients.h"
 #include "pcl/kdtree/kdtree.h"
-#include "pcl/kdtree/tree_types.h"
+#include "pcl/kdtree/impl/kdtree_flann.hpp"
+#include "pcl/search/impl/organized.hpp"
+
+//#include "pcl/kdtree/tree_types.h"
 #include <pcl/features/normal_3d.h>
+#include <pcl/features/impl/normal_3d.hpp>
 
 #include "pcl/io/pcd_io.h"
 #include "point_types.h"
 #include <pcl/point_types.h>
 
 #include <pcl/filters/extract_indices.h>
+#include <pcl/filters/impl/extract_indices.hpp>
 #include <pcl/filters/passthrough.h>
+#include <pcl/filters/impl/passthrough.hpp>
 
 #include "pcl/sample_consensus/method_types.h"
 #include "pcl/sample_consensus/model_types.h"
@@ -21,11 +27,11 @@
 #include "CombineUtils.h"
 
 typedef pcl::PointXYZRGBCamSL PointT;
-typedef pcl::PointXYGRGBCam PointCamT;
+typedef pcl::PointXYZRGBCam PointCamT;
 typedef pcl::PointXYZRGB PointFrameT;
 
-typedef  pcl::KdTree<PointT> KdTree;
-typedef  pcl::KdTree<PointT>::Ptr KdTreePtr;
+typedef  pcl::search::KdTree<PointT> KdTree;
+typedef  pcl::search::KdTree<PointT>::Ptr KdTreePtr;
 
 void apply_segment_filter_frame(pcl::PointCloud<PointT> &incloud, pcl::PointCloud<PointT> &outcloud, int segment) {
     //ROS_INFO("applying filter");
@@ -204,7 +210,7 @@ Extract the clusters based on location and normals
 */
 void extractEuclideanClusters (
       const pcl::PointCloud<PointT> &cloud, const pcl::PointCloud<pcl::Normal> &normals,
-      const boost::shared_ptr<pcl::KdTree<PointT> > &tree,
+      const boost::shared_ptr<pcl::search::KdTree<PointT> > &tree,
       float tolerance, std::vector<pcl::PointIndices> &clusters, double eps_angle,
       unsigned int min_pts_per_cluster = 1,
       unsigned int max_pts_per_cluster = (std::numeric_limits<int>::max) ())
@@ -346,17 +352,19 @@ void segment (const pcl::PointCloud<PointT> &cloud,  pcl::PointCloud<PointT> &ou
     int number_neighbours = 50;
     float radius = 0.01;// 0.025
     float angle = 0.52;
-    KdTreePtr normals_tree_, clusters_tree_;
+    KdTreePtr normals_tree_ (new pcl::search::KdTree<PointT> ());
+    KdTreePtr clusters_tree_ (new pcl::search::KdTree<PointT> ());
+    //KdTreePtr normals_tree_, clusters_tree_;
     pcl::NormalEstimation<PointT, pcl::Normal> n3d_;
     pcl::PointCloud<PointT>::Ptr cloud_ptr (new pcl::PointCloud<PointT> (cloud));
     std::vector<pcl::PointIndices> clusters;
 
 
-    clusters_tree_ = boost::make_shared<pcl::KdTreeFLANN<PointT> > ();
-    initTree (0, clusters_tree_);
+   // clusters_tree_ = boost::make_shared<pcl::KdTreeFLANN<PointT> > ();
+    //initTree (0, clusters_tree_);
     clusters_tree_->setInputCloud (cloud_ptr);
 
-    normals_tree_ = boost::make_shared<pcl::KdTreeFLANN<PointT> > ();
+    //normals_tree_ = boost::make_shared<pcl::KdTreeFLANN<PointT> > ();
     n3d_.setKSearch (number_neighbours);
     n3d_.setSearchMethod (normals_tree_);
 
@@ -380,17 +388,19 @@ void segmentInPlace (pcl::PointCloud<PointT> &cloud,int min_pts_per_cluster = 10
     int number_neighbours = 50;
     float radius = 0.02;// 0.025
     float angle = 0.52;
-    KdTreePtr normals_tree_, clusters_tree_;
+    KdTreePtr normals_tree_ (new pcl::search::KdTree<PointT> ());
+    KdTreePtr clusters_tree_ (new pcl::search::KdTree<PointT> ());
+    //KdTreePtr normals_tree_, clusters_tree_;
     pcl::NormalEstimation<PointT, pcl::Normal> n3d_;
     pcl::PointCloud<PointT>::Ptr cloud_ptr (new pcl::PointCloud<PointT> (cloud));
     std::vector<pcl::PointIndices> clusters;
 
 
-    clusters_tree_ = boost::make_shared<pcl::KdTreeFLANN<PointT> > ();
-    initTree (0, clusters_tree_);
+   // clusters_tree_ = boost::make_shared<pcl::KdTreeFLANN<PointT> > ();
+    //initTree (0, clusters_tree_);
     clusters_tree_->setInputCloud (cloud_ptr);
 
-    normals_tree_ = boost::make_shared<pcl::KdTreeFLANN<PointT> > ();
+    //normals_tree_ = boost::make_shared<pcl::KdTreeFLANN<PointT> > ();
     n3d_.setKSearch (number_neighbours);
     n3d_.setSearchMethod (normals_tree_);
 

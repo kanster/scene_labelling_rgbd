@@ -16,6 +16,23 @@
  * - a ROS listener, listening to and processing kinect data
  */
 #include <iostream>
+#include "tf/tf.h"
+#include <pcl_ros/io/bag_io.h>
+
+#include "pcl/kdtree/kdtree.h"
+//#include "pcl/kdtree/impl/organized_data.hpp"
+//#include "pcl/kdtree/tree_types.h"
+#include "pcl/kdtree/impl/kdtree_flann.hpp"
+//#include "pcl/kdtree/impl/tree_types.hpp"
+
+
+//#include <pcl/kdtree/kdtree.h>
+//#include "pcl/kdtree/tree_types.h"
+//#include <pcl/kdtree/kdtree_flann.h>
+
+#include "pcl/features/normal_3d.h"
+
+
 using namespace std;
 
 
@@ -235,7 +252,7 @@ transformAsMatrix(const tf::Transform& bt)
     double mv[12];
     bt.getBasis().getOpenGLSubMatrix(mv);
 
-    btVector3 origin = bt.getOrigin();
+    tf::Vector3 origin = bt.getOrigin();
 
     outMat(0, 0) = mv[0];
     outMat(0, 1) = mv[4];
@@ -464,12 +481,12 @@ static TransformG readTranform(const string & file) {
     
     tf::Transform  getAsRosMsg()
     {
-        btTransform out;
-        btMatrix3x3 m_basis(transformMat(0,0),transformMat(0,1),transformMat(0,2),
+        tf::Transform out;
+        tf::Matrix3x3 m_basis(transformMat(0,0),transformMat(0,1),transformMat(0,2),
                             transformMat(1,0),transformMat(1,1),transformMat(1,2),
                             transformMat(2,0),transformMat(2,1),transformMat(2,2));
 
-         btVector3 origin(transformMat(0,3),transformMat(1,3),transformMat(2,3));
+         tf::Vector3 origin(transformMat(0,3),transformMat(1,3),transformMat(2,3));
          out.setBasis(m_basis);
         out.setOrigin(origin);
         return out;
@@ -545,16 +562,16 @@ static TransformG readTranform(const string & file) {
 };
 
 
-btQuaternion
+tf::Quaternion
 getQuaternion(geometry_msgs::Quaternion q)
 {
-    return btQuaternion(q.x, q.y, q.z, q.w);
+    return tf::Quaternion(q.x, q.y, q.z, q.w);
 }
 
-btVector3
+tf::Vector3
 getVector3(geometry_msgs::Vector3 v)
 {
-    return btVector3(v.x, v.y, v.z);
+    return tf::Vector3(v.x, v.y, v.z);
 
 }
 TransformG readTranform(const string & file) {
@@ -570,7 +587,8 @@ TransformG readTranform(const string & file) {
             tf::tfMessageConstPtr tf_ptr = mtf.instantiate<tf::tfMessage > ();
             assert(tf_ptr != NULL);
             std::vector<geometry_msgs::TransformStamped> bt;
-            tf_ptr->get_transforms_vec(bt);
+            //DEPRECATED   //tf_ptr->get_transforms_vec(bt);
+            bt = tf_ptr->transforms;
             tf::Transform tft(getQuaternion(bt[0].transform.rotation), getVector3(bt[0].transform.translation));
 
                 tf_count++;
@@ -584,7 +602,7 @@ TransformG readTranform(const string & file) {
   //              originalFrame->setCameraTrans (transG);
                 return transG;
 }
-/*void appendCamIndex(pcl::PointCloud<PointT>::Ptr in,pcl::PointCloud<pcl::PointXYGRGBCam>::Ptr out,int camIndex)
+/*void appendCamIndex(pcl::PointCloud<PointT>::Ptr in,pcl::PointCloud<pcl::PointXYZRGBCam>::Ptr out,int camIndex)
 {
     out->header=in->header;
     out->points.resize(in->size());
@@ -598,7 +616,7 @@ TransformG readTranform(const string & file) {
     }
 }
 */
-void appendCamIndexAndDistance(pcl::PointCloud<pcl::PointXYZRGBNormal>::Ptr in,pcl::PointCloud<pcl::PointXYGRGBCam>::Ptr out,int camIndex,VectorG camOrigin)
+void appendCamIndexAndDistance(pcl::PointCloud<pcl::PointXYZRGBNormal>::Ptr in,pcl::PointCloud<pcl::PointXYZRGBCam>::Ptr out,int camIndex,VectorG camOrigin)
 {
     out->header=in->header;
     out->points.resize(in->size());
@@ -608,9 +626,9 @@ void appendCamIndexAndDistance(pcl::PointCloud<pcl::PointXYZRGBNormal>::Ptr in,p
         out->points[i].y=in->points[i].y;
         out->points[i].z=in->points[i].z;
         out->points[i].rgb=in->points[i].rgb;
-        out->points[i].normal_x=in->points[i].normal_x;
-        out->points[i].normal_y=in->points[i].normal_y;
-        out->points[i].normal_z=in->points[i].normal_z;
+        //out->points[i].normal_x=in->points[i].normal_x;
+        //out->points[i].normal_y=in->points[i].normal_y;
+        //out->points[i].normal_z=in->points[i].normal_z;
         out->points[i].cameraIndex=camIndex;
         VectorG pt(in->points[i]);
         VectorG disp=pt.subtract(camOrigin);
@@ -649,9 +667,12 @@ double cosNormal(pcl::PointXYZRGBNormal p1,pcl::PointXYZRGBNormal p2)
 
 void appendNormals(pcl::PointCloud<pcl::PointXYZRGB>::Ptr in,pcl::PointCloud<pcl::PointXYZRGBNormal>::Ptr out)
 {
+
+
    pcl::NormalEstimation<pcl::PointXYZRGB, pcl::Normal> n3d_;
-     pcl::KdTree<pcl::PointXYZRGB>::Ptr normals_tree_, clusters_tree_;
-  normals_tree_ = boost::make_shared<pcl::KdTreeFLANN<pcl::PointXYZRGB> > ();
+  pcl::search::KdTree<pcl::PointXYZRGB>::Ptr normals_tree_ (new pcl::search::KdTree<pcl::PointXYZRGB> ());    
+  //   pcl::KdTree<pcl::PointXYZRGB>::Ptr normals_tree_, clusters_tree_;
+  //normals_tree_ = boost::make_shared<pcl::KdTreeFLANN<pcl::PointXYZRGB> > ();
 //  clusters_tree_ = boost::make_shared<pcl::KdTreeFLANN<Point> > ();
 pcl::PointCloud<pcl::Normal> cloud_normals;
   // Normal estimation parameters

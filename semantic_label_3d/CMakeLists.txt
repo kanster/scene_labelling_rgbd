@@ -8,7 +8,7 @@ include($ENV{ROS_ROOT}/core/rosbuild/rosbuild.cmake)
 #  RelWithDebInfo : w/ debug symbols, w/ optimization
 #  MinSizeRel     : w/o debug symbols, w/ optimization, stripped binaries
 #set(ROS_BUILD_TYPE RelWithDebInfo)
-
+project(semantic_labeling_3d)
 rosbuild_init()
 
 
@@ -17,9 +17,15 @@ set(EXECUTABLE_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/bin)
 #set the default path for built libraries to the "lib" directory
 set(LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/lib)
 
-rosbuild_find_ros_package(dynamic_reconfigure)
-include(${dynamic_reconfigure_PACKAGE_PATH}/cmake/cfgbuild.cmake)
-gencfg()
+#rosbuild_find_ros_package(dynamic_reconfigure)
+find_package(catkin REQUIRED dynamic_reconfigure)
+generate_dynamic_reconfigure_options(
+  cfg/pcmerger.cfg
+  #...
+)
+
+#include(${dynamic_reconfigure_PACKAGE_PATH}/cmake/cfgbuild.cmake)
+#gencfg()
 #uncomment if you have defined messages
 #rosbuild_genmsg()
 #uncomment if you have defined services
@@ -28,28 +34,32 @@ gencfg()
 #common commands for building c++ executables and libraries
 #rosbuild_add_library(${PROJECT_NAME} src/example.cpp)
 #target_link_libraries(${PROJECT_NAME} another_library)
-#rosbuild_add_boost_directories()
+rosbuild_add_boost_directories()
 #rosbuild_link_boost(${PROJECT_NAME} thread)
 #rosbuild_add_executable(example examples/example.cpp)
 #target_link_libraries(example ${PROJECT_NAME})
 
+find_package(octomap)
+include_directories(${OCTOMAP_INCLUDE_DIRS})
+link_libraries(${OCTOMAP_LIBRARIES})
 
 #rosbuild_add_executable (seg_size src/compute_num_points.cpp)
 rosbuild_add_executable (live_semantic_labeler src/openni_listener.cpp)
-rosbuild_add_executable (GUITransform src/GUITransform.cpp)
-rosbuild_add_executable (colorImage src/colorImage.cpp)
+##rosbuild_add_executable (GUITransform src/GUITransform.cpp)
+##add_dependencies(GUITransform ${PROJECT_NAME}_gencfg)
+##rosbuild_add_executable (colorImage src/colorImage.cpp)
 rosbuild_add_executable (compute_all_features src/compute_all_features.cpp)
 #rosbuild_add_executable (compute_single_frame_features src/compute_single_frame_features.cpp)
 rosbuild_add_executable (scene_segmentation src/segmentation.cpp)
 #rosbuild_add_executable (image_features src/compute_image_features.cpp)
 #rosbuild_add_executable (lidar_scene_segmentation src/segmentation_lidar.cpp)
 #rosbuild_add_executable (cleaning src/cleaning.cpp)
-rosbuild_add_executable (scene_labler src/labeler.cpp)
+##rosbuild_add_executable (scene_labler src/labeler.cpp)
 #rosbuild_add_executable (evaluate_image src/evaluate_image_pred.cpp)
 #rosbuild_add_executable (label_visualizer src/labelVisualizer.cpp)
 #rosbuild_add_executable (merge_frames src/merge_frames.cpp)
 #rosbuild_add_executable (apply_labels src/applyLabels.cpp)
-rosbuild_add_executable (label_visualizer src/labelVisualizer.cpp)
+##rosbuild_add_executable (label_visualizer src/labelVisualizer.cpp)
 #rosbuild_add_executable (merge_frames src/merge_frames.cpp)
 #rosbuild_add_executable (apply_labels src/applyLabels.cpp)
 #rosbuild_add_executable (compute_features src/compute_features.cpp)
@@ -60,8 +70,8 @@ rosbuild_add_executable (label_visualizer src/labelVisualizer.cpp)
 #rosbuild_add_executable (genImagePairs src/genImagePairs.cpp)
 #rosbuild_add_executable (multiFramePCD2Bag src/pcd2bag.cpp)
 rosbuild_add_executable (combineVisibility src/VisibilityMerge.cpp)
-rosbuild_add_executable (pcmerger src/pcMerger2.cpp)
-rosbuild_add_executable (bag2pcd src/bag2pcd.cpp)
+##rosbuild_add_executable (pcmerger src/pcMerger2.cpp)
+#rosbuild_add_executable (bag2pcd src/bag2pcd.cpp)
 #rosbuild_add_executable (image_and_label src/genImageAndLabelFile.cpp)
 #rosbuild_add_executable (cfg3D src/cfg3D.cpp)
 
@@ -77,5 +87,8 @@ rosbuild_add_executable (bag2pcd src/bag2pcd.cpp)
 ##rosbuild_add_executable (extract_frames src/extract_frames.cpp)
 ##rosbuild_add_executable (mls src/mls.cpp)
 ##target_link_libraries ( pcl_kdtree pcl_surface)
+
+##target_link_libraries ( GUITransform  libvtkCommon.so libvtkRendering.so libvtkFiltering.so  )
+##rosbuild_link_boost(GUITransform thread)
 
 ##rosbuild_add_executable (combineNearestCam src/NearestCamMerge.cpp)

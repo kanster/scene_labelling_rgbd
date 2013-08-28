@@ -9,28 +9,26 @@
 #define	POINT_TYPES_H
 #include <pcl/point_types.h>
 #include <pcl/point_cloud.h>
-#include <pcl/io/pcd_io.h>
-#include <pcl/filters/impl/extract_indices.hpp>
-#include <pcl/filters/impl/passthrough.hpp>
-#include <pcl/kdtree/kdtree.h>
-#include "pcl/kdtree/tree_types.h"
-#include <pcl/kdtree/kdtree_flann.h>
-#include <pcl/kdtree/organized_data.h>
-#include "pcl/kdtree/impl/kdtree_flann.hpp"
-#include "pcl/kdtree/impl/tree_types.hpp"
-#include "pcl/kdtree/impl/organized_data.hpp"
-#include "pcl/features/normal_3d.h"
-#include "pcl/features/impl/normal_3d.hpp"
+//#include <pcl/io/pcd_io.h>
+//#include <pcl/filters/impl/extract_indices.hpp>
+//#include <pcl/filters/impl/passthrough.hpp>
+//#include <pcl/kdtree/kdtree.h>
+//#include "pcl/kdtree/tree_types.h"
+//#include <pcl/kdtree/kdtree_flann.h>
+//#include <pcl/kdtree/organized_data.h>
+//#include "pcl/kdtree/impl/kdtree_flann.hpp"
+//#include "pcl/kdtree/impl/tree_types.hpp"
+//#include "pcl/kdtree/impl/organized_data.hpp"
+//#include "pcl/features/normal_3d.h"
+//#include "pcl/features/impl/normal_3d.hpp"
 
 namespace pcl {
 
-    struct PointXYGRGBCam {
+    struct PointXYZRGBCam {
         PCL_ADD_POINT4D;
         float rgb;
-        PCL_ADD_NORMAL4D;
         uint32_t cameraIndex;
         float distance;
-        float curvature;
 
     };
     
@@ -53,13 +51,7 @@ namespace pcl {
     struct PointXYZRGBCamSL {
         PCL_ADD_POINT4D;
 
-        union {
-
-            struct {
-                float rgb;
-            };
-            float data_c[4];
-        };
+        float rgb;
         uint32_t cameraIndex;
         float distance;
         uint32_t segment;
@@ -82,7 +74,7 @@ namespace pcl {
 }
 
 POINT_CLOUD_REGISTER_POINT_STRUCT(
-        pcl::PointXYGRGBCam,
+        pcl::PointXYZRGBCam,
         (float, x, x)
         (float, y, y)
         (float, z, z)

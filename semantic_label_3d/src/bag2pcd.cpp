@@ -1,51 +1,51 @@
 #include <ros/ros.h>
 #include <rosbag/bag.h>
 #include <rosbag/view.h>
-#include <boost/numeric/ublas/matrix.hpp>
-#include <boost/numeric/ublas/io.hpp>
-#include <boost/foreach.hpp>
+//#include <boost/numeric/ublas/matrix.hpp>
+//#include <boost/numeric/ublas/io.hpp>
+//#include <boost/foreach.hpp>
 //#include <Eigen/Core>
-#include <message_filters/subscriber.h>
-#include <message_filters/time_synchronizer.h>
-#include <stdint.h>
-#include "pcl/ros/register_point_struct.h"
-#include "pcl/kdtree/kdtree.h"
-#include "pcl/kdtree/tree_types.h"
+//#include <message_filters/subscriber.h>
+//#include <message_filters/time_synchronizer.h>
+//#include <stdint.h>
+//#include "pcl/ros/register_point_struct.h"
+//#include "pcl/kdtree/kdtree.h"
+//#include "pcl/kdtree/tree_types.h"
 #include "pcl/io/pcd_io.h"
 #include <string>
 #include <pcl_ros/io/bag_io.h>
-#include "pcl/kdtree/kdtree_flann.h"
-#include <sensor_msgs/Image.h>
-#include <sensor_msgs/CameraInfo.h>
-#include <message_filters/subscriber.h>
-#include <message_filters/synchronizer.h>
-#include <message_filters/sync_policies/approximate_time.h>
-#include <sensor_msgs/CameraInfo.h>
-#include <sensor_msgs/PointCloud2.h>
+//#include "pcl/kdtree/kdtree_flann.h"
+//#include <sensor_msgs/Image.h>
+//#include <sensor_msgs/CameraInfo.h>
+//#include <message_filters/subscriber.h>
+//#include <message_filters/synchronizer.h>
+//#include <message_filters/sync_policies/approximate_time.h>
+//#include <sensor_msgs/CameraInfo.h>
+//#include <sensor_msgs/PointCloud2.h>
 //#include <Eigen/Core>
-#include <tf/transform_listener.h>
-#include <pcl/filters/passthrough.h>
-#include <pcl/filters/extract_indices.h>
-#include <pcl/features/normal_3d.h>
-#include <pcl/kdtree/kdtree_flann.h>
-#include <pcl/sample_consensus/method_types.h>
-#include <pcl/sample_consensus/model_types.h>
-#include <pcl/segmentation/sac_segmentation.h>
-#include <pcl/filters/project_inliers.h>
-#include <pcl/surface/convex_hull.h>
-#include <pcl/segmentation/extract_polygonal_prism_data.h>
-#include <pcl/segmentation/extract_clusters.h>
-#include <pcl/filters/radius_outlier_removal.h>
-#include "pcl/io/pcd_io.h"
+//#include <tf/transform_listener.h>
+//#include <pcl/filters/passthrough.h>
+//#include <pcl/filters/extract_indices.h>
+//#include <pcl/features/normal_3d.h>
+//#include <pcl/kdtree/kdtree_flann.h>
+//#include <pcl/sample_consensus/method_types.h>
+//#include <pcl/sample_consensus/model_types.h>
+//#include <pcl/segmentation/sac_segmentation.h>
+//#include <pcl/filters/project_inliers.h>
+//#include <pcl/surface/convex_hull.h>
+//#include <pcl/segmentation/extract_polygonal_prism_data.h>
+//#include <pcl/segmentation/extract_clusters.h>
+//#include <pcl/filters/radius_outlier_removal.h>
+//#include "pcl/io/pcd_io.h"
 #include "includes/point_types.h"
-#include "pcl/filters/statistical_outlier_removal.h"
+//#include "pcl/filters/statistical_outlier_removal.h"
 #include "pcl/point_cloud.h"
 typedef pcl::PointXYZRGBCamSL PointT;
 #include "includes/CombineUtils.h"
 #include<set>
-#include "pcl_visualization/pcl_visualizer.h"
+//#include "pcl_visualization/pcl_visualizer.h"
 using namespace std;
-typedef pcl_visualization::PointCloudColorHandler<sensor_msgs::PointCloud2> ColorHandler;
+//typedef pcl_visualization::PointCloudColorHandler<sensor_msgs::PointCloud2> ColorHandler;
 
 bool detectOcclusion=true;
 int
@@ -61,9 +61,9 @@ main(int argc, char** argv)
     bag.open(argv[1], rosbag::bagmode::Read);
     pcl::PointCloud<pcl::PointXYZRGB>::Ptr  cloud_filtered(new pcl::PointCloud<pcl::PointXYZRGB> ());// cloud_transformed(new pcl::PointCloud<PointT > ());
     pcl::PointCloud<PointT>::Ptr  cloud_normal(new pcl::PointCloud<PointT > ());// cloud_transformed(new pcl::PointCloud<PointT > ());
-    pcl::PointCloud<pcl::PointXYGRGBCam>::Ptr final_cloud(new pcl::PointCloud<pcl::PointXYGRGBCam> ());
-    pcl::PointCloud<pcl::PointXYGRGBCam>::Ptr final_cloud_backup(new pcl::PointCloud<pcl::PointXYGRGBCam> ());
-    pcl::PointCloud<pcl::PointXYGRGBCam>::Ptr temp_cloud(new pcl::PointCloud<pcl::PointXYGRGBCam> ());
+    pcl::PointCloud<pcl::PointXYZRGBCam>::Ptr final_cloud(new pcl::PointCloud<pcl::PointXYZRGBCam> ());
+    pcl::PointCloud<pcl::PointXYZRGBCam>::Ptr final_cloud_backup(new pcl::PointCloud<pcl::PointXYZRGBCam> ());
+    pcl::PointCloud<pcl::PointXYZRGBCam>::Ptr temp_cloud(new pcl::PointCloud<pcl::PointXYZRGBCam> ());
 
     int tf_count = 0;
     int pcl_count = 0;
@@ -109,7 +109,7 @@ main(int argc, char** argv)
     pcl::PointCloud<pcl::PointXYZRGBCamSL> inp_cloud;
 
     int rejectCount=0;
-    pcl::PassThrough<pcl::PointXYZRGBCamSL> pass_;
+//    pcl::PassThrough<pcl::PointXYZRGBCamSL> pass_;
         cloud_blob_prev = cloud_blob;
 	if (it != view.end ())
 	  {

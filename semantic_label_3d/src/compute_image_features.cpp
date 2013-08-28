@@ -30,8 +30,8 @@ typedef pcl::PointXYInt PointT;
 #include<boost/numeric/ublas/io.hpp>
 
 
-#include "pcl_visualization/pcl_visualizer.h"
-typedef pcl_visualization::PointCloudColorHandler<sensor_msgs::PointCloud2> ColorHandler;
+#include "pcl/visualization/pcl_visualizer.h"
+typedef pcl::visualization::PointCloudColorHandler<sensor_msgs::PointCloud2> ColorHandler;
 typedef ColorHandler::Ptr ColorHandlerPtr;
 #include "time.h"
 

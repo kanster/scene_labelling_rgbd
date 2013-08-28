@@ -16,6 +16,7 @@ template <class D> class matrx{
   void allocate()   {
     delete[] data;
     data = new D [maxsize*maxsize];
+   // data = new D [maxsize*actualsize];
     };
   matrx() {};                  // private ctor's
   matrx(int newmaxsize) {matrx(newmaxsize,newmaxsize);};

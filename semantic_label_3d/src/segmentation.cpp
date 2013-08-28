@@ -1,29 +1,35 @@
-
+#include <ros/console.h>
 
 #include <stdint.h>
 
 #include "includes/color.cpp"
 #include "pcl/ModelCoefficients.h"
 #include "pcl/kdtree/kdtree.h"
-#include "pcl/kdtree/tree_types.h"
+#include "pcl/kdtree/impl/kdtree_flann.hpp"
+#include "pcl/search/impl/organized.hpp"
+
+//#include "pcl/kdtree/tree_types.h"
 #include <pcl/features/normal_3d.h>
+#include <pcl/features/impl/normal_3d.hpp>
 
 #include "pcl/io/pcd_io.h"
 #include "includes/point_types.h"
 #include <pcl/point_types.h>
 
 #include <pcl/filters/extract_indices.h>
+#include <pcl/filters/impl/extract_indices.hpp>
 #include <pcl/filters/passthrough.h>
+#include <pcl/filters/impl/passthrough.hpp>
 
 #include "pcl/sample_consensus/method_types.h"
 #include "pcl/sample_consensus/model_types.h"
 #include "pcl/segmentation/sac_segmentation.h"
 
-typedef pcl::PointXYGRGBCam PointT;
+typedef pcl::PointXYZRGBCam PointT;
 typedef pcl::PointXYZRGBCamSL PointOutT;
 
-typedef  pcl::KdTree<PointT> KdTree;
-typedef  pcl::KdTree<PointT>::Ptr KdTreePtr;
+typedef  pcl::search::KdTree<PointT> KdTree;
+typedef  pcl::search::KdTree<PointT>::Ptr KdTreePtr;
 
 
 
@@ -439,7 +445,8 @@ int
   sensor_msgs::PointCloud2 cloud_blob;
 
   pcl::PointCloud<PointT> cloud;
-  KdTreePtr normals_tree_, clusters_tree_;
+  KdTreePtr normals_tree_ (new pcl::search::KdTree<PointT> ());
+  KdTreePtr clusters_tree_ (new pcl::search::KdTree<PointT> ());
 
   pcl::PCDWriter writer;
   pcl::ExtractIndices<PointT> extract;
@@ -447,7 +454,7 @@ int
   pcl::NormalEstimation<PointT, pcl::Normal> n3d_;
 
   // Normal estimation parameters
-  normals_tree_ = boost::make_shared<pcl::KdTreeFLANN<PointT> > ();
+  //normals_tree_ = boost::make_shared<pcl::KdTreeFLANN<PointT> > ();
   n3d_.setKSearch (number_neighbours);
   n3d_.setSearchMethod (normals_tree_);
 
@@ -488,7 +495,7 @@ int
 
   
   // Cluster the points
-  clusters_tree_ = boost::make_shared<pcl::KdTreeFLANN<PointT> > ();
+  //clusters_tree_ = boost::make_shared<pcl::KdTreeFLANN<PointT> > ();
   std::vector<pcl::PointIndices> clusters;
   
 
@@ -502,7 +509,7 @@ int
   }
   boost::shared_ptr <const std::vector<int> > indicesp (new std::vector<int>(indices));
   //pcl::PointIndices::Ptr indicesp (new pcl::PointIndices( ));
-  initTree (0, clusters_tree_);
+  //initTree (0, clusters_tree_);
   clusters_tree_->setInputCloud (cloud_filtered );// ,indicesp);
  // extractEuclideanClusters ( *cloud_filtered, clusters_tree_, tolerance, clusters,  min_pts_per_cluster, max_pts_per_cluster);
  
@@ -531,6 +538,10 @@ int
 
   if (atoi(argv[2]) == 1) {fn = fn + "_segmented_xyzn.pcd";} else { fn = fn + "_segmented_xyzrgbn.pcd";}
   writer.write ( fn,combined_cloud, true);
+  std::string fn2 (argv[1]);
+  fn2 = fn2.substr(0,fn2.find('.'));
+  if (atoi(argv[2]) == 1) {fn2 = fn2 + "_segmented_xyzn_ascii.pcd";} else { fn2 = fn2 + "_segmented_xyzrgbn_ascii.pcd";}
+  writer.write ( fn2,combined_cloud, false);
 
 cout <<"wrote file "<<fn<<endl;
   return (0);

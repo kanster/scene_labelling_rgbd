@@ -61,7 +61,7 @@
 
 #include <pcl_ros/io/bag_io.h>
 
-#include "pcl_visualization/pcl_visualizer.h"
+#include "pcl/visualization/pcl_visualizer.h"
 #include <dynamic_reconfigure/server.h>
 #include <semantic_label_3d/pcmergerConfig.h>
 #include "transformation.h"
@@ -70,7 +70,7 @@ typedef pcl::PointXYZRGB PointT;
 //#include "includes/CombineUtils.h"
 
 
-typedef pcl_visualization::PointCloudColorHandler<sensor_msgs::PointCloud2> ColorHandler;
+typedef pcl::visualization::PointCloudColorHandler<PointT> ColorHandler;
 typedef ColorHandler::Ptr ColorHandlerPtr;
 
 
@@ -78,7 +78,7 @@ std::string fn;
 dynamic_reconfigure::Server < semantic_label_3d::pcmergerConfig > *srv;
 semantic_label_3d::pcmergerConfig conf;
 boost::recursive_mutex global_mutex;
-pcl_visualization::PCLVisualizer viewer("3D Viewer");
+pcl::visualization::PCLVisualizer viewer("3D Viewer");
 int viewportOrig = 0;
 ColorHandlerPtr color_handler_new;
 ColorHandlerPtr color_handler_prev;
@@ -153,12 +153,15 @@ void updateUI() {
     transformXYZYPR(*cloud_ptr, *cloud_mod_ptr, conf.x, conf.y, conf.z, conf.yaw/180.0*PI, conf.pitch/180.0*PI, conf.roll/180.0*PI);
     filterInPlace(*cloud_mod_ptr,conf.minx,conf.miny,conf.minz, conf.maxx,conf.maxy,conf.maxz);
     viewer.removePointCloud("new");
-    cloud_mod_ptr->width=0;
-    cloud_mod_ptr->height=0;
-    pcl::toROSMsg(*cloud_mod_ptr, cloud_blobc_mod);
-    color_handler_new.reset(new pcl_visualization::PointCloudColorHandlerRGBField<sensor_msgs::PointCloud2 > (cloud_blobc_mod));
-    viewer.addPointCloud(*cloud_mod_ptr, color_handler_new, "new", viewportOrig);
-    
+    //cloud_mod_ptr->width=0;
+    //cloud_mod_ptr->height=0;
+    //pcl::toROSMsg(*cloud_mod_ptr, cloud_blobc_mod);
+    //color_handler_new.reset(new pcl::visualization::PointCloudColorHandlerRGBField<PointT> (cloud_mod_ptr));
+    //viewer.addPointCloud(cloud_mod_ptr, color_handler_new, "new", viewportOrig);
+    pcl::PointCloud<PointT>::ConstPtr cloud_ptr_v(new pcl::PointCloud<PointT > (*cloud_mod_ptr));  
+        pcl::visualization::PointCloudColorHandlerRGBField<PointT> color_handler(cloud_ptr_v);
+          //viewer.addPointCloud (*cloud_ptr, color_handler, "cloud");
+          viewer.addPointCloud (cloud_ptr_v, color_handler, "cloud");    
    // viewer.spinOnce();
 }
 
@@ -175,7 +178,8 @@ void cameraCallback (const sensor_msgs::PointCloud2ConstPtr& point_cloud)
        pcl::PointCloud<pcl::PointXYZRGB> cloud;
        pcl::fromROSMsg(*point_cloud, *cloud_ptr);
        //convertTypeDummy(cloud,*cloud_ptr,0);
-    color_handler_new.reset(new pcl_visualization::PointCloudColorHandlerRGBField<sensor_msgs::PointCloud2 > (*point_cloud));
+    pcl::PointCloud<PointT>::ConstPtr cloud_ptr_v(new pcl::PointCloud<PointT > (*cloud_ptr));
+    color_handler_new.reset(new pcl::visualization::PointCloudColorHandlerRGBField<PointT > (cloud_ptr_v));
        updatePC=true;
        ready=true;
        
@@ -223,11 +227,11 @@ void cameraCallback (const sensor_msgs::PointCloud2ConstPtr& point_cloud)
           geometry_msgs::TransformStamped gmMsg;
           tf::transformStampedTFToMsg (tf::StampedTransform(frameTrans.getAsRosMsg(), ftime,"/openni_camera", "/batch_transform"),gmMsg);
           tf::tfMessage tfMsg;
-          tfMsg.set_transforms_size (1);
+          //tfMsg.set_transforms_size (1);
                       std::vector<geometry_msgs::TransformStamped> bt;
                       bt.push_back (gmMsg);
 
-          tfMsg.set_transforms_vec (bt);
+          tfMsg.transforms = bt;
           bag_.write("/tf",ftime,tfMsg);
           bag_.close();
           
@@ -328,7 +332,9 @@ ros::Subscriber cloud_sub_;
   cloud_ptr->height=0;
   
   ready=true;
-      color_handler_new.reset(new pcl_visualization::PointCloudColorHandlerRGBField<sensor_msgs::PointCloud2 > (cloud_blob));        
+       pcl::PointCloud<PointT>::ConstPtr cloud_ptr_v(new pcl::PointCloud<PointT > (*cloud_ptr));
+
+      color_handler_new.reset(new pcl::visualization::PointCloudColorHandlerRGBField<PointT > (cloud_ptr_v));        
   }
   else
   {
