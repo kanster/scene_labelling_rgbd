@@ -21,3 +21,31 @@ It has some issues with the latest electric distribution(which is due to change 
 
 If you face difficulties, contact "hema" or "aa755" at cs.cornell.edu
 
+__
+
+The library is provided by Cornell Robotic Lab, also thanks to hemakoppula's advice.
+1) Environment Setting:
+OS : Ubuntu 12.04 LTS precise
+ROS : groovy
+
+2) Building Procedure:
+ 1. install Ubuntu
+ 2. according to the instructions in [ros wiki](http://wiki.ros.org/groovy/Installation/Ubuntu) , I just list the commands for my setting , type the following commands in Terminal: 
+    `sudo sh -c 'echo "deb http://packages.ros.org/ros/ubuntu precise main" > /etc/apt/sources.list.d/ros-latest.list'
+    wget http://packages.ros.org/ros.key -O - | sudo apt-key add -
+    sudo apt-get update
+    sudo apt-get install ros-groovy-desktop-full
+    apt-cache search ros-groovy
+    sudo rosdep init
+    rosdep update
+    echo "source /opt/ros/groovy/setup.bash" >> ~/.bashrc
+    sudo apt-get install python-rosinstall
+    sudo apt-get install ros-groovy-octomap
+    sudo apt-get install ros-groovy-octomap-mapping`
+
+ 3. reopen Terminal to reload .bashrc
+ 4. download library from current repository (forked from [here](https://github.com/hemakoppula/scene_labelling_rgbd))
+ 5. after uncompressing the library, change directory to the library root directory. (It should be scene_labelling_rgbd) and type the following command in Terminal : 
+1. ./install_dependencies.sh
+2. cd svm-python-v204 && make
+3. cd ../semantic_label_3dexport &&  export ROS_PACKAGE_PATH="\$ROS_PACKAGE_PATH:$PWD" && make
