@@ -47,6 +47,6 @@ ROS : groovy
  3. reopen Terminal to reload .bashrc
  4. download library from current repository (forked from https://github.com/hemakoppula/scene_labelling_rgbd )
  5. after uncompressing the library, change directory to the library root directory. (It should be scene_labelling_rgbd) and type the following command in Terminal : 
-1. ./install_dependencies.sh
-2. cd svm-python-v204 && make
-3. cd ../semantic_label_3dexport &&  export ROS_PACKAGE_PATH="$ROS_PACKAGE_PATH:$PWD" && make
+    1. ./install_dependencies.sh
+    2. cd svm-python-v204 && make
+    3. cd ../semantic_label_3dexport &&  export ROS_PACKAGE_PATH="$ROS_PACKAGE_PATH:$PWD" && make
