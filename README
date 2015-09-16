@@ -31,7 +31,7 @@ ROS : groovy
 2) Building Procedure:
  
  1. install Ubuntu
- 2. according to the instructions in [ros wiki](http://wiki.ros.org/groovy/Installation/Ubuntu) , I just list the commands for my setting , type the following commands in Terminal: 
+ 2. according to the instructions in http://wiki.ros.org/groovy/Installation/Ubuntu , I just list the commands for my setting , type the following commands in Terminal: 
     1. sudo sh -c 'echo "deb http://packages.ros.org/ros/ubuntu precise main" > /etc/apt/sources.list.d/ros-latest.list'
     2. wget http://packages.ros.org/ros.key -O - | sudo apt-key add -
     3. sudo apt-get update
@@ -45,7 +45,7 @@ ROS : groovy
     11. sudo apt-get install ros-groovy-octomap-mapping
 
  3. reopen Terminal to reload .bashrc
- 4. download library from current repository (forked from [here](https://github.com/hemakoppula/scene_labelling_rgbd))
+ 4. download library from current repository (forked from https://github.com/hemakoppula/scene_labelling_rgbd )
  5. after uncompressing the library, change directory to the library root directory. (It should be scene_labelling_rgbd) and type the following command in Terminal : 
 1. ./install_dependencies.sh
 2. cd svm-python-v204 && make
