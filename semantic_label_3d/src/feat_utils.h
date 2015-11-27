@@ -1,3 +1,5 @@
+#define PCL_NO_PRECOMPILE
+
 #include "includes/LinearLS.h"
 #include "includes/matrix.h"
 #include "float.h"
@@ -17,6 +19,11 @@
 //#include "descriptors_3d/all_descriptors.h"
 #include <opencv/cv.h>
 #include <opencv/highgui.h>
+
+
+
+
+
 
 //#include <point_cloud_mapping/kdtree/kdtree_ann.h>
 #include <vector>

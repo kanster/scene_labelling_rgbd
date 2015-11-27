@@ -46,7 +46,7 @@ message(STATUS "EIGEN INCLUDE DIRS ${EIGEN_INCLUDE_DIRS}")
 include_directories( ${EIGEN_INCLUDE_DIRS} )
 
 
-find_package(PCL 1.8.0 REQUIRED)
+find_package(PCL 1.7.0 REQUIRED)
 if(PCL_FOUND)
     message(STATUS "PCL INCLUDE DIRS ${PCL_INCLUDE_DIRS}")
     message(STATUS "PCL LIBS REQUIRED ${PCL_LIBRARIES}")
@@ -63,9 +63,9 @@ if(OpenCV_FOUND)
 endif()
 
 
-find_package(octomap)
-include_directories(${OCTOMAP_INCLUDE_DIRS})
-link_libraries(${OCTOMAP_LIBRARIES})
+#find_package(octomap)
+#include_directories(${OCTOMAP_INCLUDE_DIRS})
+#link_libraries(${OCTOMAP_LIBRARIES})
 
 #rosbuild_add_executable (seg_size src/compute_num_points.cpp)
 rosbuild_add_executable (live_semantic_labeler src/openni_listener.cpp)

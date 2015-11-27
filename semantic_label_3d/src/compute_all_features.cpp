@@ -1,3 +1,5 @@
+#define PCL_NO_PRECOMPILE
+
 #include <octomap/OcTree.h>
 #include <octomap_ros/conversions.h>
 
@@ -7,17 +9,21 @@
 
 #include <pcl/filters/impl/filter.hpp>
 #include <pcl/filters/filter.h>
+#include "pcl/impl/instantiate.hpp"
+#include <pcl/filters/extract_indices.h>
+#include <pcl/filters/impl/extract_indices.hpp>
+
 #include <pcl/kdtree/impl/kdtree_flann.hpp>
 #include <pcl/kdtree/kdtree.h>
 #include <pcl/kdtree/kdtree_flann.h>
 #include <pcl/search/impl/kdtree.hpp>
 #include <pcl/search/impl/search.hpp>
-#include <pcl/filters/impl/extract_indices.hpp>
+
 
 
 
 #include "includes/CovarianceMatrix.h"
-#include"feat_utils.h"
+#include "feat_utils.h"
 
 
 bool UseVolFeats=false;

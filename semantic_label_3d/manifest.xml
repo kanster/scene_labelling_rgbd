@@ -1,27 +1,27 @@
 <package>
-  <description brief="semantic_label_3d">
+    <description brief="semantic_label_3d">
 
      This labels a kinect pointcloud with semantic labels like wall, chair, table, computer, monitor, printer etc.
      It also contains tools to segment , label and transform pointclouds. See url for more details
 
-  </description>
-  <author> Abhishek Anand, Hema Koppula, Dave Kotfis </author>
-  <review status="unreviewed" notes=""/>
-  <url>http://pr.cs.cornell.edu/sceneunderstanding/</url>
-  <depend package="pcl_ros"/>
-  <!--depend package="pcl"/-->
-  <!--depend package="eigen"/-->
-  <!--depend package="pcl_visualization"/-->
-  <depend package="rospy"/>
-  <depend package="roscpp"/>
-        <!--depend package="octomap_ros"/-->
-	<depend package="octomap"/>
-	<depend package="rosbag"/>
-	<!--depend package="opencv2"/-->
+    </description>
+    <author> Abhishek Anand, Hema Koppula, Dave Kotfis </author>
+    <review status="unreviewed" notes=""/>
+    <url>http://pr.cs.cornell.edu/sceneunderstanding/</url>
+    <depend package="pcl_ros"/>
+    <!--depend package="pcl"/-->
+    <!--depend package="eigen"/-->
+    <!--depend package="pcl_visualization"/-->
+    <depend package="rospy"/>
+    <depend package="roscpp"/>
+    <depend package="octomap_ros"/>
+    <depend package="octomap"/>
+    <depend package="rosbag"/>
+    <!--depend package="opencv2"/-->
 
-  <export>
-    <cpp cflags="-I${prefix}/src/includes"/>
-  </export>
+    <export>
+        <cpp cflags="-I${prefix}/src/includes"/>
+    </export>
  <!-- 
 temporarily removed:
 

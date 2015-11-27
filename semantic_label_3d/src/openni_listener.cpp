@@ -1,3 +1,6 @@
+#define PCL_NO_PRECOMPILE
+
+
 #include "includes/CovarianceMatrix.h"
 #include "float.h"
 #include "math.h"
@@ -47,6 +50,9 @@ using namespace boost;
 #include <octomap_ros/conversions.h>
 #include <boost/foreach.hpp>
 #include <boost/tokenizer.hpp>
+
+#include <pcl/search/impl/kdtree.hpp>
+#include <pcl/features/impl/feature.hpp>
 using namespace std;
 using namespace boost;
 using namespace octomap;
@@ -1379,7 +1385,8 @@ float get_occupancy_feature(const pcl::PointCloud<PointT> &cloud1, const pcl::Po
         for (double r = 0.05; r <= distance - 0.05; r += 0.05) {
             count++;
             VectorG point = p1.add((p2.subtract(p1).normalizeAndReturn()).multiply(r));
-            pcl::PointXYZ pt(point.v[0], point.v[1], point.v[2]);
+//            pcl::PointXYZ pt(point.v[0], point.v[1], point.v[2]);
+            point3d pt(point.v[0], point.v[1], point.v[2]);
             treeNode = tree.search(pt);
             if (treeNode) {
                 if (treeNode->getOccupancy() > 0.5) {
@@ -1394,7 +1401,7 @@ float get_occupancy_feature(const pcl::PointCloud<PointT> &cloud1, const pcl::Po
         }
         if (count == 0) {
             VectorG point = p1.add(p2.subtract(p1).multiply(0.5));
-            pcl::PointXYZ pt(point.v[0], point.v[1], point.v[2]);
+            point3d pt(point.v[0], point.v[1], point.v[2]); //pcl::PointXYZ pt(point.v[0], point.v[1], point.v[2]);
             treeNode = tree.search(pt);
             if (treeNode) {
                 if (treeNode->getOccupancy() > 0.5) {
@@ -2568,7 +2575,7 @@ int write_feats(TransformG transG, pcl::PointCloud<pcl::PointXYZRGBCamSL>::Ptr &
     featfile << featfilename;
     featfile.close();
     string command = "../svm-python-v204/svm_python_classify --m svmstruct_mrf --l micro --lm nonassoc --cm sumLE1.IP --omf ../svm-python-v204/" + environment + "_objectMap.txt temp." + featfilename + " ../svm-python-v204/" + environment + "Model pred." + featfilename + " > out." + featfilename;
-    system(command.data());
+    std::system(command.data());
 
     std::ifstream predLabels;
     predLabels.open(("pred." + featfilename).data()); // open the file containing predictions

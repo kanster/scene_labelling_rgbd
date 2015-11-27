@@ -1,3 +1,6 @@
+#define PCL_NO_PRECOMPILE
+
+
 #include <ros/console.h>
 
 #include <stdint.h>
@@ -24,6 +27,11 @@
 #include "pcl/sample_consensus/method_types.h"
 #include "pcl/sample_consensus/model_types.h"
 #include "pcl/segmentation/sac_segmentation.h"
+
+#include <sensor_msgs/PointCloud2.h>
+#include <sensor_msgs/PointCloud.h>
+
+#include <pcl/search/impl/kdtree.hpp>
 
 typedef pcl::PointXYZRGBCam PointT;
 typedef pcl::PointXYZRGBCamSL PointOutT;
@@ -441,34 +449,66 @@ int
   float angle = 0.52;
   float hue_tolerance = 50;
 
+    //========================================
+//  sensor_msgs::PointCloud2 cloud_blob;
 
-  sensor_msgs::PointCloud2 cloud_blob;
+//  pcl::PointCloud<PointT> cloud;
+//  KdTreePtr normals_tree_ (new pcl::search::KdTree<PointT> ());
+//  KdTreePtr clusters_tree_ (new pcl::search::KdTree<PointT> ());
 
-  pcl::PointCloud<PointT> cloud;
-  KdTreePtr normals_tree_ (new pcl::search::KdTree<PointT> ());
-  KdTreePtr clusters_tree_ (new pcl::search::KdTree<PointT> ());
+//  pcl::PCDWriter writer;
+//  pcl::ExtractIndices<PointT> extract;
+//  pcl::PassThrough<PointT> pass_;
+//  pcl::NormalEstimation<PointT, pcl::Normal> n3d_;
 
-  pcl::PCDWriter writer;
-  pcl::ExtractIndices<PointT> extract;
-  pcl::PassThrough<PointT> pass_;
-  pcl::NormalEstimation<PointT, pcl::Normal> n3d_;
-
-  // Normal estimation parameters
-  //normals_tree_ = boost::make_shared<pcl::KdTreeFLANN<PointT> > ();
-  n3d_.setKSearch (number_neighbours);
-  n3d_.setSearchMethod (normals_tree_);
+//  // Normal estimation parameters
+//  //normals_tree_ = boost::make_shared<pcl::KdTreeFLANN<PointT> > ();
+//  n3d_.setKSearch (number_neighbours);
+//  n3d_.setSearchMethod (normals_tree_);
 
  
- // read from file
-  if (pcl::io::loadPCDFile (argv[1], cloud_blob) == -1)
-  {
-    ROS_ERROR ("Couldn't read file test_pcd.pcd");
-    return (-1);
-  }
-  ROS_INFO ("Loaded %d data points from %s  with the following fields: %s", (int)(cloud_blob.width * cloud_blob.height), argv[1], pcl::getFieldsList (cloud_blob).c_str ());
+// // read from file
+//  if (pcl::io::loadPCDFile (argv[1], cloud_blob) == -1)
+//  {
+//    ROS_ERROR ("Couldn't read file test_pcd.pcd");
+//    return (-1);
+//  }
+//  ROS_INFO ("Loaded %d data points from %s  with the following fields: %s", (int)(cloud_blob.width * cloud_blob.height), argv[1], pcl::getFieldsList (cloud_blob).c_str ());
 
-  // Convert to the templated message type
-   pcl::fromROSMsg (cloud_blob, cloud);
+//  // Convert to the templated message type
+//   pcl::fromROSMsg (cloud_blob, cloud);
+
+//   sensor_msgs::PointCloud2 cloud_blob;
+
+   //=======================================================
+//    sensor_msgs::PointCloud2 cloud_blob;
+   pcl::PointCloud<PointT> cloud;
+   KdTreePtr normals_tree_ (new pcl::search::KdTree<PointT> ());
+   KdTreePtr clusters_tree_ (new pcl::search::KdTree<PointT> ());
+
+   pcl::PCDWriter writer;
+   pcl::ExtractIndices<PointT> extract;
+   pcl::PassThrough<PointT> pass_;
+   pcl::NormalEstimation<PointT, pcl::Normal> n3d_;
+
+   // Normal estimation parameters
+   //normals_tree_ = boost::make_shared<pcl::KdTreeFLANN<PointT> > ();
+   n3d_.setKSearch (number_neighbours);
+   n3d_.setSearchMethod (normals_tree_);
+
+
+  // read from file
+   if (pcl::io::loadPCDFile (argv[1], cloud) == -1)
+   {
+     ROS_ERROR ("Couldn't read file test_pcd.pcd");
+     return (-1);
+   }
+   ROS_INFO ("Loaded %d data points from %s  with the following fields: %s", (int)(cloud.width * cloud.height), argv[1], pcl::getFieldsList (cloud).c_str ());
+
+   // Convert to the templated message type
+//    pcl::fromROSMsg (cloud_blob, cloud);
+
+
    pcl::PointCloud<PointT>::Ptr cloud_ptr (new pcl::PointCloud<PointT> (cloud));
   
   //Step1: remove nans
