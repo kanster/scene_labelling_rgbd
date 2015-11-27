@@ -43,7 +43,7 @@ using namespace boost;
 #include "includes/segmentAndLabel.h"
 #include "openni_listener.h"
 #include <octomap/octomap.h>
-#include <octomap_ros/OctomapROS.h>
+//#include <octomap_ros/OctomapROS.h>
 #include <octomap_ros/conversions.h>
 #include <boost/foreach.hpp>
 #include <boost/tokenizer.hpp>
@@ -678,7 +678,7 @@ inline void addToEdgeHeader(std::string featName, size_t numTimes = 1) {
     }
 }
 
-void buildOctoMap(const pcl::PointCloud<PointT> &cloud, OcTreeROS & tree) {
+void buildOctoMap(const pcl::PointCloud<PointT> &cloud, OcTree & tree) {
 
 
 
@@ -696,7 +696,9 @@ void buildOctoMap(const pcl::PointCloud<PointT> &cloud, OcTreeROS & tree) {
     VectorG cam_coordinates = originalFrame->getCameraTrans().getOrigin();
     pcl::PointXYZ origin(cam_coordinates.v[0], cam_coordinates.v[1], cam_coordinates.v[2]);
     // insert to the tree
-    tree.insertScan(xyzcloud, origin, -1, true);
+
+    // @todo, Kanzhi, insert scan
+//    tree.insertScan(xyzcloud, origin, -1, true);
 }
 
 void apply_segment_filter(pcl::PointCloud<PointT> &incloud, pcl::PointCloud<PointT> &outcloud, int segment) {
@@ -1361,9 +1363,9 @@ void get_global_features(const pcl::PointCloud<PointT> &cloud, vector<float> &fe
 
 }
 
-float get_occupancy_feature(const pcl::PointCloud<PointT> &cloud1, const pcl::PointCloud<PointT> &cloud2, OcTreeROS & tree) {
+float get_occupancy_feature(const pcl::PointCloud<PointT> &cloud1, const pcl::PointCloud<PointT> &cloud2, OcTree & tree) {
     //
-    OcTreeROS::NodeType* treeNode;
+    OcTree::NodeType* treeNode;
     int occCount = 0;
     int totalCount = 0;
     int unknownCount = 0;
@@ -1527,7 +1529,7 @@ void get_pair_features(int segment_id, vector<int> &neighbor_list,
         std::map<int, int> &segment_num_index_map,
         vector<SpectralProfile> & spectralProfiles,
         map < int, vector<float> > &edge_features,
-        OcTreeROS & tree) {
+        OcTree & tree) {
 
     SpectralProfile segment1Spectral = spectralProfiles[segment_num_index_map[segment_id]];
 
@@ -2377,9 +2379,9 @@ int write_feats(TransformG transG, pcl::PointCloud<pcl::PointXYZRGBCamSL>::Ptr &
 
 
 
-    OcTreeROS tree(0.01);
+    OcTree tree(0.01);
     if (UseVolFeats) {
-        OcTreeROS::NodeType* treeNode;
+        OcTree::NodeType* treeNode;
         buildOctoMap(cloud, tree);
     }
 

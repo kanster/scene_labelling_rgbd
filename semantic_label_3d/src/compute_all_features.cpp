@@ -1,5 +1,24 @@
+#include <octomap/OcTree.h>
+#include <octomap_ros/conversions.h>
+
+#include <pcl/octree/octree.h>
+#include <pcl/octree/impl/octree_search.hpp>
+#include <octomap/octomap_deprecated.h>
+
+#include <pcl/filters/impl/filter.hpp>
+#include <pcl/filters/filter.h>
+#include <pcl/kdtree/impl/kdtree_flann.hpp>
+#include <pcl/kdtree/kdtree.h>
+#include <pcl/kdtree/kdtree_flann.h>
+#include <pcl/search/impl/kdtree.hpp>
+#include <pcl/search/impl/search.hpp>
+#include <pcl/filters/impl/extract_indices.hpp>
+
+
+
 #include "includes/CovarianceMatrix.h"
 #include"feat_utils.h"
+
 
 bool UseVolFeats=false;
 vector<OriginalFrameInfo*> originalFrames;
@@ -7,7 +26,7 @@ vector<OriginalFrameInfo*> originalFrames;
     pcl::PointCloud<PointT> cloudUntransformed;
     pcl::PointCloud<PointT> cloudUntransformedUnfiltered;
 
-    bool addNodeHeader=true;;
+    bool addNodeHeader=true;
     bool addEdgeHeader=true;
     
     vector<std::string> nodeFeatNames;
@@ -773,9 +792,9 @@ void get_global_features(const pcl::PointCloud<PointT> &cloud, vector<float> &fe
 	}
 } */
 
-float get_occupancy_feature(const pcl::PointCloud<PointT> &cloud1, const pcl::PointCloud<PointT> &cloud2,  OcTreeROS & tree){
+float get_occupancy_feature(const pcl::PointCloud<PointT> &cloud1, const pcl::PointCloud<PointT> &cloud2, OcTree & tree){
     //
-    OcTreeROS::NodeType* treeNode;
+    OcTree::NodeType* treeNode;
     int occCount = 0;
     int totalCount = 0;
     int unknownCount = 0;
@@ -791,7 +810,9 @@ float get_occupancy_feature(const pcl::PointCloud<PointT> &cloud1, const pcl::Po
         {
             count ++;
             VectorG point = p1.add( ( p2.subtract(p1).normalizeAndReturn() ).multiply(r));
-            pcl::PointXYZ pt (point.v[0],point.v[1],point.v[2]);
+//            pcl::PointXYZ pt (point.v[0],point.v[1],point.v[2]);
+//            PointT pt(point.v[0], point.v[1], point.v[2]);
+            point3d pt(point.v[0],point.v[1],point.v[2]);
             treeNode = tree.search(pt);
             if (treeNode){
                 if (treeNode->getOccupancy() > 0.5){occCount++;}
@@ -806,7 +827,8 @@ float get_occupancy_feature(const pcl::PointCloud<PointT> &cloud1, const pcl::Po
         if(count ==0)
         {
             VectorG point = p1.add(p2.subtract(p1).multiply(0.5));
-            pcl::PointXYZ pt (point.v[0],point.v[1],point.v[2]);
+//            pcl::PointXYZ pt (point.v[0],point.v[1],point.v[2]);
+            point3d pt (point.v[0],point.v[1],point.v[2]);
             treeNode = tree.search(pt);
             if (treeNode){
                 if (treeNode->getOccupancy() > 0.5){occCount++;}
@@ -856,7 +878,7 @@ void get_pair_features( int segment_id, vector<int>  &neighbor_list,
 						std::map<int,int>  &segment_num_index_map,
                         vector<SpectralProfile> & spectralProfiles,
                         map < int, vector<float> > &edge_features,
-                        OcTreeROS & tree) {
+                        OcTree & tree) {
 
     SpectralProfile segment1Spectral=spectralProfiles[segment_num_index_map[segment_id]];
 
@@ -928,7 +950,7 @@ void add_distance_features(const pcl::PointCloud<PointT> &cloud, map< int,vector
 }
 
 
-void buildOctoMap(const pcl::PointCloud<PointT> &cloud,  OcTreeROS & tree)
+void buildOctoMap(const pcl::PointCloud<PointT> &cloud,  OcTree & tree)
 {
 
     
@@ -952,11 +974,15 @@ void buildOctoMap(const pcl::PointCloud<PointT> &cloud,  OcTreeROS & tree)
         // convert to  pointXYZ format
         sensor_msgs::PointCloud2 cloud_blob;
         pcl::toROSMsg(*cloud_cam,cloud_blob);
-        pcl::PointCloud<pcl::PointXYZ> xyzcloud;
-        pcl::fromROSMsg(cloud_blob, xyzcloud);
+//        pcl::PointCloud<pcl::PointXYZ> xyzcloud;
+//        pcl::fromROSMsg(cloud_blob, xyzcloud);
+        octomap::Pointcloud xyzcloud;
+//        octomap::pointCloud2ToOctomap( cloud_blob, xyzcloud );
+
         // find the camera co-ordinate
         VectorG cam_coordinates = originalFrames[ci]->getCameraTrans().getOrigin();
-        pcl::PointXYZ origin (cam_coordinates.v[0], cam_coordinates.v[1], cam_coordinates.v[2]);
+//        pcl::PointXYZ origin (cam_coordinates.v[0], cam_coordinates.v[1], cam_coordinates.v[2]);
+        point3d origin (cam_coordinates.v[0], cam_coordinates.v[1], cam_coordinates.v[2]);
         // insert to the tree
         tree.insertScan(xyzcloud,origin,-1,true);
     }
@@ -999,10 +1025,10 @@ int main(int argc, char** argv) {
       originalFrames[i]->applyPostGlobalTrans (globalTransform);
     
     // call buildOctoMap here
-        OcTreeROS tree(0.01);
+        OcTree tree(0.01);
     if(UseVolFeats)
     {
-        OcTreeROS::NodeType* treeNode;
+        OcTree::NodeType* treeNode;
         buildOctoMap(cloud,  tree);  
     }
     

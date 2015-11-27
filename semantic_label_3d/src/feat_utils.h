@@ -12,6 +12,8 @@
 #include <pcl/filters/impl/extract_indices.hpp>
 #include "pcl/features/intensity_spin.h"
 #include "pcl/features/normal_3d.h"
+#include <pcl/filters/impl/filter.hpp>
+#include <pcl/filters/filter.h>
 //#include "descriptors_3d/all_descriptors.h"
 #include <opencv/cv.h>
 #include <opencv/highgui.h>
@@ -52,7 +54,7 @@ typedef  pcl::KdTree<PointT>::Ptr KdTreePtr;
 // octomap realted
 
 #include <octomap/octomap.h>
-#include <octomap_ros/OctomapROS.h>
+//#include <octomap_ros/OctomapROS.h>
 #include <octomap_ros/conversions.h>
 using namespace octomap;
 

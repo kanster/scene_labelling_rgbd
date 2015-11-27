@@ -39,6 +39,30 @@ rosbuild_add_boost_directories()
 #rosbuild_add_executable(example examples/example.cpp)
 #target_link_libraries(example ${PROJECT_NAME})
 
+find_package(PkgConfig REQUIRED)
+
+pkg_check_modules(EIGEN REQUIRED eigen3)
+message(STATUS "EIGEN INCLUDE DIRS ${EIGEN_INCLUDE_DIRS}")
+include_directories( ${EIGEN_INCLUDE_DIRS} )
+
+
+find_package(PCL 1.8.0 REQUIRED)
+if(PCL_FOUND)
+    message(STATUS "PCL INCLUDE DIRS ${PCL_INCLUDE_DIRS}")
+    message(STATUS "PCL LIBS REQUIRED ${PCL_LIBRARIES}")
+    include_directories(${PCL_INCLUDE_DIRS})
+    link_directories(${PCL_LIBRARY_DIRS})
+    add_definitions(${PCL_DEFINITIONS})
+endif()
+
+
+find_package(OpenCV 2.4 REQUIRED)
+if(OpenCV_FOUND)
+    message(STATUS "OPENCV INCLUDE DIRS ${OpenCV_INCLUDE_DIRS}")
+    message(STATUS "OPENCV LIBS REQUIRED ${OpenCV_LIBS}")
+endif()
+
+
 find_package(octomap)
 include_directories(${OCTOMAP_INCLUDE_DIRS})
 link_libraries(${OCTOMAP_LIBRARIES})
@@ -75,7 +99,11 @@ rosbuild_add_executable (combineVisibility src/VisibilityMerge.cpp)
 #rosbuild_add_executable (image_and_label src/genImageAndLabelFile.cpp)
 #rosbuild_add_executable (cfg3D src/cfg3D.cpp)
 
-
+#====== link dependencies ================#
+target_link_libraries(live_semantic_labeler ${PCL_LIBRARIES} ${OpenCV_LIBS})
+target_link_libraries(compute_all_features ${PCL_LIBRARIES} ${OpenCV_LIBS})
+target_link_libraries(scene_segmentation ${PCL_LIBRARIES} ${OpenCV_LIBS})
+target_link_libraries(combineVisibility ${PCL_LIBRARIES} ${OpenCV_LIBS})
 
 #rosbuild_add_executable (shape_features src/shape_features.cpp)
 #rosbuild_add_executable (distance_feat src/distance_feat.cpp)
